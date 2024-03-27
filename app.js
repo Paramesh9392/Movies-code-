@@ -1,10 +1,10 @@
 const express = require('express')
-const { open } = require('sqlite')
+const {open} = require('sqlite')
 const sqlite3 = require('sqlite3')
 
 const path = require('path')
 
-const databasePath = path.join(_dirname, 'moviesdata.db')
+const databasePath = path.join(__dirname, 'moviesdata.db')
 
 const app = express()
 
@@ -27,16 +27,16 @@ const initializeDbAndServer = async () => {
 
 initializeDbAndServer()
 
-const ConvertMOvieDbObjTOResponseObj = (dbObj) => {
+const ConvertMOvieDbObjTOResponseObj = dbObj => {
   return {
     movieId: dbObj.movie_id,
-    directorId : dbObj.director_id,
-    movieName : dbObj.movie_name,
-    leadActor : dbObj.lead_actor,
+    directorId: dbObj.director_id,
+    movieName: dbObj.movie_name,
+    leadActor: dbObj.lead_actor,
   }
 }
 
-const convertDirectorObjToResponseObj = (dbobj) => {
+const convertDirectorObjToResponseObj = dbobj => {
   return {
     directorId: dbobj.director_id,
     directorName: dbobj.director_name,
@@ -60,7 +60,7 @@ app.post('/movies/', async (request, response) => {
   const {directorId, movieName, leadActor} = request.body
   const postMoviesQuery = `
   INSERT INTO
-   movie (directorId ,movie_name ,lead_actor)
+   movie (director_id ,movie_name ,lead_actor)
    VALUES (${directorId} ,'${movieName}', '${leadActor}');`
 
   await database.run(postMoviesQuery)
@@ -78,7 +78,7 @@ app.get('/movies/:movieId/', async (request, response) => {
   WHERE 
     movie_id = '${movieId}';`
 
-  const movie = await database.all(getMovieQuery)
+  const movie = await database.get(getMovieQuery)
   response.send(ConvertMOvieDbObjTOResponseObj(movie))
 })
 
@@ -96,7 +96,7 @@ app.put('/movies/:movieId/', async (request, response) => {
     lead_actor ='${leadActor}'
   
   WHERE 
-    movie_id =${movieId};`;
+    movie_id =${movieId};`
 
   await database.run(upadateQuery)
   response.send('Movie Details Updated')
@@ -131,7 +131,7 @@ app.get('/directors/', async (request, response) => {
   )
 })
 
-app.get('/directors/:directorsId/movies/', async (request, response) => {
+app.get('/directors/:directorId/movies/', async (request, response) => {
   const {directorId} = request.params
 
   const getDirectorMovieQuery = `
@@ -149,3 +149,4 @@ app.get('/directors/:directorsId/movies/', async (request, response) => {
 })
 
 module.exports = app
+
